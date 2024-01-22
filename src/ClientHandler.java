@@ -72,13 +72,14 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // Methode zum Schließen von Socket und Streams
+    // Methode zum Schließen von Socket und Streams  
     private void closeEverything(Socket socket, BufferedReader reader, BufferedWriter writer) {
         try {
             // Alle Ressourcen werden geschlossen
-            if (socket != null && !socket.isClosed()) {
+            if (socket != null && !socket.isClosed()){
                 socket.close();
             }
+
             if (reader != null) {
                 reader.close();
             }
@@ -90,4 +91,7 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }
+
+
+
 }
