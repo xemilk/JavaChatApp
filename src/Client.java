@@ -7,6 +7,7 @@ import java.net.Socket;
 
 public class Client {
 
+    public static boolean sendFromMe = false;
     public static void main(String[] args) {
         try {
             // Verbindung zum Server herstellen
@@ -32,7 +33,8 @@ public class Client {
             // Nachrichten vom Benutzer an den Server senden
             String message;
             while ((message = userInputReader.readLine()) != null) {
-                writer.write(message + "\n");
+                sendFromMe = true;
+                writer.write( message + "\n");
                 writer.flush();
             }
 
@@ -42,6 +44,7 @@ public class Client {
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
+            
         }
     }
 
@@ -60,7 +63,11 @@ public class Client {
             try {
                 while ((message = reader.readLine()) != null) {
                     // Nachrichten vom Server anzeigen
-                    System.out.println(message);
+                    
+                        System.out.println(message);
+                    
+                    
+                    
                 }
             } catch (IOException e) {
                 e.printStackTrace();

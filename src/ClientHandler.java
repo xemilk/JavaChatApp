@@ -28,8 +28,8 @@ public class ClientHandler implements Runnable {
             // Der ClientHandler wird zur Liste der aktiven ClientHandler hinzugefügt
             clientHandlers.add(this);
 
-        
-            broadcastMessage("Server: " + clientUsername + " ist dem Chat beigetreten");
+
+            broadcastMessage("Server: " + clientUsername + " ist dem Chat beigetreten", this);
         } catch (IOException e) {
             // Fehlerbehandlung bei der Initialisierung
             closeEverything(socket, bReader, bWriter);
@@ -48,7 +48,7 @@ public class ClientHandler implements Runnable {
                 msgFromClient = bReader.readLine();
 
                 // Die empfangene Nachricht wird an alle Clients gesendet
-                broadcastMessage(msgFromClient);
+                broadcastMessage(msgFromClient, this);
             } catch (Exception e) {
                 // Fehlerbehandlung bei der Kommunikation mit dem Client
                 closeEverything(socket, bReader, bWriter);
@@ -58,12 +58,14 @@ public class ClientHandler implements Runnable {
     }
 
     // Methode zum Senden einer Nachricht an alle Clients
-    private void broadcastMessage(String message) {
+    private void broadcastMessage(String message, ClientHandler sender) {
         for (ClientHandler clientHandler : clientHandlers) {
             try {
-                // Nachrichten werden an alle Clients über deren BufferedWriter gesendet
-                clientHandler.bWriter.write(message + "\n");
-                clientHandler.bWriter.flush();
+                if (clientHandler != sender) {
+                    // Nachrichten werden an alle Clients außer dem Sender über deren BufferedWriter gesendet
+                    clientHandler.bWriter.write("[" + clientUsername + "] " + message + "\n");
+                    clientHandler.bWriter.flush();
+                }
             } catch (IOException e) {
                 // Fehlerbehandlung beim Senden der Nachricht
                 closeEverything(clientHandler.socket, clientHandler.bReader, clientHandler.bWriter);
@@ -72,11 +74,11 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // Methode zum Schließen von Socket und Streams  
+    // Methode zum Schließen von Socket und Streams
     private void closeEverything(Socket socket, BufferedReader reader, BufferedWriter writer) {
         try {
             // Alle Ressourcen werden geschlossen
-            if (socket != null && !socket.isClosed()){
+            if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
 
@@ -91,7 +93,4 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }
-
-
-
 }
