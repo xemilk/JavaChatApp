@@ -15,7 +15,7 @@ public class ClientHandler implements Runnable {
     private BufferedWriter bWriter;
     private String clientUsername;
 
-    public boolean offMsg=false;
+
 
     // Konstruktor des ClientHandlers
     public ClientHandler(Socket socket) {
@@ -34,7 +34,9 @@ public class ClientHandler implements Runnable {
 
         } catch (IOException e) {
             // Fehlerbehandlung bei der Initialisierung
+            broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
             closeEverything(socket, bReader, bWriter);
+
         }
     }
 
@@ -49,10 +51,12 @@ public class ClientHandler implements Runnable {
                 // Nachrichten vom Client werden vom BufferedReader gelesen
                 msgFromClient = bReader.readLine();
 
+
                 // Die empfangene Nachricht wird an alle Clients gesendet
                 broadcastMessage(msgFromClient, this, false);
             } catch (Exception e) {
                 // Fehlerbehandlung bei der Kommunikation mit dem Client
+            broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
                 closeEverything(socket, bReader, bWriter);
                 break;
             }
@@ -75,7 +79,8 @@ public class ClientHandler implements Runnable {
 
                 }
             } catch (IOException e) {
-                // Fehlerbehandlung beim Senden der Nachricht
+                // F1ehlerbehandlung beim Senden der Nachricht
+            broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
                 closeEverything(clientHandler.socket, clientHandler.bReader, clientHandler.bWriter);
                 clientHandlers.remove(clientHandler);
             }
