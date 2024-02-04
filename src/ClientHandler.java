@@ -15,6 +15,8 @@ public class ClientHandler implements Runnable {
     private BufferedWriter bWriter;
     private String clientUsername;
 
+    public boolean offMsg=false;
+
     // Konstruktor des ClientHandlers
     public ClientHandler(Socket socket) {
         try {
@@ -28,8 +30,8 @@ public class ClientHandler implements Runnable {
             // Der ClientHandler wird zur Liste der aktiven ClientHandler hinzugefügt
             clientHandlers.add(this);
 
+            broadcastMessage(clientUsername+ " ist dem Chat beigetreten!",this, true);
 
-            broadcastMessage("Server: " + clientUsername + " ist dem Chat beigetreten", this);
         } catch (IOException e) {
             // Fehlerbehandlung bei der Initialisierung
             closeEverything(socket, bReader, bWriter);
@@ -48,7 +50,7 @@ public class ClientHandler implements Runnable {
                 msgFromClient = bReader.readLine();
 
                 // Die empfangene Nachricht wird an alle Clients gesendet
-                broadcastMessage(msgFromClient, this);
+                broadcastMessage(msgFromClient, this, false);
             } catch (Exception e) {
                 // Fehlerbehandlung bei der Kommunikation mit dem Client
                 closeEverything(socket, bReader, bWriter);
@@ -58,13 +60,19 @@ public class ClientHandler implements Runnable {
     }
 
     // Methode zum Senden einer Nachricht an alle Clients
-    private void broadcastMessage(String message, ClientHandler sender) {
+    private void broadcastMessage(String message, ClientHandler sender, boolean offServerMsg) {
+        String prefix = "["+clientUsername+"] ";
         for (ClientHandler clientHandler : clientHandlers) {
             try {
                 if (clientHandler != sender) {
                     // Nachrichten werden an alle Clients außer dem Sender über deren BufferedWriter gesendet
-                    clientHandler.bWriter.write("[" + clientUsername + "] " + message + "\n");
-                    clientHandler.bWriter.flush();
+                    if(offServerMsg){
+                        prefix="[Server] ";
+                    }
+                        clientHandler.bWriter.write(prefix + message + "\n");
+                        clientHandler.bWriter.flush();
+
+
                 }
             } catch (IOException e) {
                 // Fehlerbehandlung beim Senden der Nachricht
@@ -73,6 +81,7 @@ public class ClientHandler implements Runnable {
             }
         }
     }
+
 
     // Methode zum Schließen von Socket und Streams
     private void closeEverything(Socket socket, BufferedReader reader, BufferedWriter writer) {

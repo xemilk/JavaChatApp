@@ -16,12 +16,12 @@ public class Server {
         Server server = new Server(serverSocket);
         server.startServer();                                   // Server starten
     }
-        
+
     public void startServer(){
-        try{                                                    
+        try{
             while(!serverSocket.isClosed()){                                // Solange die Verbindung besteht
                 Socket socket = serverSocket.accept();                      // Neue Verbindungen akzeptieren
-                System.out.println("Ein neuer Client ist verbunden");   
+                System.out.println("Ein neuer Client ist verbunden");
                 ClientHandler clientHandler = new ClientHandler(socket);    // Client-Handler für die Verbindung erstellen
 
                 Thread thread = new Thread(clientHandler);           // Thread für den Client-Handler erstellen

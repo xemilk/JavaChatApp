@@ -38,14 +38,14 @@ public class Client {
                 writer.flush();
             }
 
-            
+
             // Ressourcen schließen
             reader.close();
             writer.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
-            
+
         }
     }
 
@@ -64,15 +64,15 @@ public class Client {
             try {
                 while ((message = reader.readLine()) != null) {
                     // Nachrichten vom Server anzeigen
-                   
-                        System.out.println(message);           
-                    
+
+                        System.out.println(message);
+
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
-   
+
     }
 }
