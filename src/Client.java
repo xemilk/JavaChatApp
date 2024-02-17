@@ -8,12 +8,14 @@ import java.net.Socket;
 public class Client {
 
     public static boolean sendFromMe = false;
+
     public static void main(String[] args) {
         try {
             // Verbindung zum Server herstellen
             Socket socket = new Socket("localhost", 50000);
 
-            // BufferedReader und BufferedWriter für die Kommunikation mit dem Server erstellen
+            // BufferedReader und BufferedWriter für die Kommunikation mit dem Server
+            // erstellen
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
@@ -34,10 +36,9 @@ public class Client {
             String message;
             while ((message = userInputReader.readLine()) != null) {
                 sendFromMe = true;
-                writer.write( message + "\n");
+                writer.write(message + "\n");
                 writer.flush();
             }
-
 
             // Ressourcen schließen
             reader.close();
@@ -60,12 +61,12 @@ public class Client {
 
         @Override
         public void run() {
-              String message;
+            String message;
             try {
                 while ((message = reader.readLine()) != null) {
                     // Nachrichten vom Server anzeigen
 
-                        System.out.println(message);
+                    System.out.println(message);
 
                 }
             } catch (IOException e) {
@@ -73,6 +74,6 @@ public class Client {
             }
         }
 
-
     }
+    // test
 }
