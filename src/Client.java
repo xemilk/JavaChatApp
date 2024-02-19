@@ -8,10 +8,13 @@ import java.net.Socket;
 public class Client {
 
     public static boolean sendFromMe = false;
+    public static GUI app = new GUI();
 
     public static void main(String[] args) {
         try {
-            // Verbindung zum Server herstellen
+// Verbindung zum Server herstellen
+            
+          
             Socket socket = new Socket("localhost", 50000);
 
             // BufferedReader und BufferedWriter für die Kommunikation mit dem Server
@@ -75,5 +78,5 @@ public class Client {
         }
 
     }
-    // test
+    
 }
