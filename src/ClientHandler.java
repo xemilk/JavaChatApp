@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -14,8 +15,7 @@ public class ClientHandler implements Runnable {
     private BufferedReader bReader;
     private BufferedWriter bWriter;
     private String clientUsername;
-
-
+    private FileWriter fileWriter;
 
     // Konstruktor des ClientHandlers
     public ClientHandler(Socket socket) {
@@ -45,15 +45,18 @@ public class ClientHandler implements Runnable {
     public void run() {
         String msgFromClient;
 
+
         // Schleife für die Verarbeitung eingehender Nachrichten vom Client
         while (socket.isConnected()) {
             try {
+                this.fileWriter = new FileWriter("chatlog.txt", true);
                 // Nachrichten vom Client werden vom BufferedReader gelesen
                 msgFromClient = bReader.readLine();
 
 
                 // Die empfangene Nachricht wird an alle Clients gesendet
                 broadcastMessage(msgFromClient, this, false);
+                logMessageToFile(msgFromClient, clientUsername);
             } catch (Exception e) {
                 // Fehlerbehandlung bei der Kommunikation mit dem Client
             broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
@@ -63,7 +66,16 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // Methode zum Sendeniner Nachricht an alle Clients
+    private void logMessageToFile(String message, String username) {
+        try {
+            fileWriter.write("["+username+"] " + message + "\n");
+            fileWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Methode zum Senden einer Nachricht an alle Clients
     private void broadcastMessage(String message, ClientHandler sender, boolean offServerMsg) {
         String prefix = "["+clientUsername+"] ";
         for (ClientHandler clientHandler : clientHandlers) {
