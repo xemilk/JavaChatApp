@@ -19,6 +19,7 @@ public class Server {
 
     public void startServer(){
         try{
+            System.out.println("Server gestartet");
             while(!serverSocket.isClosed()){                                // Solange die Verbindung besteht
                 Socket socket = serverSocket.accept();                      // Neue Verbindungen akzeptieren
                 System.out.println("Ein neuer Client ist verbunden");

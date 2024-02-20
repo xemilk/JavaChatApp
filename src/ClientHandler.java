@@ -63,7 +63,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // Methode zum Senden einer Nachricht an alle Clients
+    // Methode zum Sendeniner Nachricht an alle Clients
     private void broadcastMessage(String message, ClientHandler sender, boolean offServerMsg) {
         String prefix = "["+clientUsername+"] ";
         for (ClientHandler clientHandler : clientHandlers) {
