@@ -9,33 +9,38 @@ import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
 
-    public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
+    // Festlegung des Keys für die Verschlüsselung
+    private static final int KRYPTO_SCHLUESSEL = 3;
 
-    private Socket socket;
-    private BufferedReader bReader;
-    private BufferedWriter bWriter;
-    private String clientUsername;
-    private FileWriter fileWriter;
+    public static ArrayList<ClientHandler> clientHandlerListe = new ArrayList<>(); // Liste mit allen clientHandlerListe
 
-    // Konstruktor des ClientHandlers
+    private Socket benutzerSocket;
+    private BufferedReader chEingang;
+    private BufferedWriter chAusgang;
+    private String clientBenutzername;
+
+
+    // Konstruktor des clientHandlerListe
     public ClientHandler(Socket socket) {
         try {
-            this.socket = socket;
-            this.bWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.bReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            this.benutzerSocket = socket; // Übergabe Parameter
+            this.chAusgang = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream())); // BufferedWriter und Reader für Input und Output
+            this.chEingang = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
             // Der Benutzername des Clients wird vom BufferedReader gelesen
-            this.clientUsername = bReader.readLine();
+            this.clientBenutzername = chEingang.readLine();
+
+
 
             // Der ClientHandler wird zur Liste der aktiven ClientHandler hinzugefügt
-            clientHandlers.add(this);
+            clientHandlerListe.add(this);
 
-            broadcastMessage(clientUsername+ " ist dem Chat beigetreten!",this, true);
+            broadcastMessage(cryptoMsg(clientBenutzername, KRYPTO_SCHLUESSEL, true) + " ist dem Chat beigetreten!", this, true); // Beitritt kenzeichnen
 
         } catch (IOException e) {
             // Fehlerbehandlung bei der Initialisierung
-            broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
-            closeEverything(socket, bReader, bWriter);
+            broadcastMessage(cryptoMsg(clientBenutzername, KRYPTO_SCHLUESSEL, true) + " hat den Chat verlassen!", this, true); // Verlassen kennzeichen
+            closeEverything(socket, chEingang, chAusgang);
 
         }
     }
@@ -45,60 +50,49 @@ public class ClientHandler implements Runnable {
     public void run() {
         String msgFromClient;
 
-
         // Schleife für die Verarbeitung eingehender Nachrichten vom Client
-        while (socket.isConnected()) {
+        while (benutzerSocket.isConnected()) {
             try {
-                this.fileWriter = new FileWriter("chatlog.txt", true);
                 // Nachrichten vom Client werden vom BufferedReader gelesen
-                msgFromClient = bReader.readLine();
+                msgFromClient = chEingang.readLine();
 
 
                 // Die empfangene Nachricht wird an alle Clients gesendet
                 broadcastMessage(msgFromClient, this, false);
-                logMessageToFile(msgFromClient, clientUsername);
+
             } catch (Exception e) {
                 // Fehlerbehandlung bei der Kommunikation mit dem Client
-            broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
-                closeEverything(socket, bReader, bWriter);
+                broadcastMessage(cryptoMsg(clientBenutzername, KRYPTO_SCHLUESSEL, true) + " hat den Chat verlassen!", this, true);
+                closeEverything(benutzerSocket, chEingang, chAusgang);
                 break;
             }
         }
     }
 
-    private void logMessageToFile(String message, String username) {
-        try {
-            fileWriter.write("["+username+"] " + message + "\n");
-            fileWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
 
     // Methode zum Senden einer Nachricht an alle Clients
-    private void broadcastMessage(String message, ClientHandler sender, boolean offServerMsg) {
-        String prefix = "["+clientUsername+"] ";
-        for (ClientHandler clientHandler : clientHandlers) {
+    private void broadcastMessage(String message, ClientHandler sender, boolean serverMsg) {
+        String prefix = "[" + clientBenutzername + "] ";
+        for (ClientHandler clientHandler : clientHandlerListe) {
             try {
                 if (clientHandler != sender) {
                     // Nachrichten werden an alle Clients außer dem Sender über deren BufferedWriter gesendet
-                    if(offServerMsg){
-                        prefix="[Server] ";
+                    if (serverMsg) {
+                        clientHandler.chAusgang.write(cryptoMsg("[Server] " + message + "\n", KRYPTO_SCHLUESSEL, false));
+                    }else{
+                        clientHandler.chAusgang.write(prefix + message + "\n");
                     }
-                        clientHandler.bWriter.write(prefix + message + "\n");
-                        clientHandler.bWriter.flush();
-
-
+                    clientHandler.chAusgang.flush();
                 }
             } catch (IOException e) {
-                // F1ehlerbehandlung beim Senden der Nachricht
-            broadcastMessage(clientUsername+ " hat den Chat verlassen!",this, true);
-                closeEverything(clientHandler.socket, clientHandler.bReader, clientHandler.bWriter);
-                clientHandlers.remove(clientHandler);
+                // Fehlerbehandlung beim Senden der Nachricht
+                broadcastMessage(clientBenutzername + cryptoMsg( " hat den Chat verlassen!", KRYPTO_SCHLUESSEL, false), this, true);
+                closeEverything(clientHandler.benutzerSocket, clientHandler.chEingang, clientHandler.chAusgang);
+                clientHandlerListe.remove(clientHandler);
             }
         }
     }
-
 
     // Methode zum Schließen von Socket und Streams
     private void closeEverything(Socket socket, BufferedReader reader, BufferedWriter writer) {
@@ -119,4 +113,30 @@ public class ClientHandler implements Runnable {
             e.printStackTrace();
         }
     }
+
+    public static String cryptoMsg(String msg, int key, boolean decrypt) {
+        StringBuilder res = new StringBuilder();
+
+        for (int i = 0; i < msg.length(); ++i) {
+            char c = msg.charAt(i);
+            if (Character.isLetter(c)) {
+                char basis;
+                if (Character.isLowerCase(c)) {
+                    basis = 'a';
+                } else {
+                    basis = 'A';
+                }
+                int verschiebung = decrypt ? (26 - key) % 26 : key;
+                char verschoben = (char) (basis + (c - basis + verschiebung) % 26);
+                res.append(verschoben);
+            } else {
+                res.append(c); // Non-letters remain unchanged
+            }
+        }
+
+        return res.toString();
+    }
 }
+
+
+
