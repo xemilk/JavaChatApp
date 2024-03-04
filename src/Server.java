@@ -5,14 +5,14 @@ import java.net.Socket;
 public class Server {
 
     private ServerSocket serverSocket; // Initialisierung einer ServerSocket Instanz
-    private static final int SERVER_PORT = 50000;   // Festlegen der Portnummer
+    private static final int SERVER_PORT = 40000;   // Festlegen der Portnummer
 
     public Server(ServerSocket serverSocket){ // Konstruktor des Servers
         this.serverSocket = serverSocket;
     }
 
     public static void main(String[] args) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(SERVER_PORT);   // ServerSocket mit TCP-Port 80 erstellen
+        ServerSocket serverSocket = new ServerSocket(50000);   // ServerSocket mit TCP-Port 80 erstellen
         Server server = new Server(serverSocket);
         server.startServer();                                   // Server starten
     }

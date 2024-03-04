@@ -59,6 +59,7 @@ public class ClientHandler implements Runnable {
 
                 // Die empfangene Nachricht wird an alle Clients gesendet
                 broadcastMessage(msgFromClient, this, false);
+                System.out.println(msgFromClient);
 
             } catch (Exception e) {
                 // Fehlerbehandlung bei der Kommunikation mit dem Client
@@ -137,6 +138,5 @@ public class ClientHandler implements Runnable {
         return res.toString();
     }
 }
-
 
 
