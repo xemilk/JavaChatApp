@@ -26,7 +26,8 @@ public class ChattingScreen extends javax.swing.JFrame {
 
   public ChattingScreen(){
     initComponents();
-    setIconImage(new ImageIcon("C:\\Users\\Emil\\Documents\\NetBeansProjects\\ChatApp\\src\\res\\chat_ico.png").getImage());
+    String path = "chat_ico.png";
+    setIconImage(new ImageIcon(path).getImage());
 setVisible(true);
   }
 
@@ -103,7 +104,7 @@ setVisible(true);
     });
 
     jLabel3.setIcon(
-        new javax.swing.ImageIcon("C:\\Users\\Emil\\Documents\\NetBeansProjects\\ChatApp\\src\\res\\chat_small.png")); // NOI18N
+        new javax.swing.ImageIcon("chat_small.png")); // NOI18N
     jLabel3.setAutoscrolls(true);
 
     jScrollPane1.setBorder(null);

@@ -67,7 +67,8 @@ public boolean isVerified(){
     private void initComponents() {
 
       // Fenstereinstellungen
-        setIconImage(new ImageIcon("C:\\Users\\Emil\\Documents\\NetBeansProjects\\ChatApp\\src\\res\\chat_ico.png").getImage());
+        String path = "chat_ico.png";
+        setIconImage(new ImageIcon(path).getImage());
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("LocalChat");
         setAlwaysOnTop(true);
@@ -126,7 +127,7 @@ public boolean isVerified(){
           }
       });
         // Logo
-        logo.setIcon(new javax.swing.ImageIcon("C:\\Users\\Emil\\Documents\\NetBeansProjects\\ChatApp\\src\\res\\chat.png")); // NOI18N
+        logo.setIcon(new javax.swing.ImageIcon("chat.png")); // NOI18N
 
 
         // Ebenen und Positionen der Elemente
@@ -203,9 +204,10 @@ public boolean isVerified(){
            // portNum = getServerAdressfromTextField();
           //  username = getUsernamefromTextField();
 
-          //  this.dispose(); // Close the LogInScreen
+          this.dispose(); // Close the LogInScreen
+          System.exit(0);
         } else {
-            JOptionPane.showMessageDialog(this, "Please enter a valid username and port number (50000).");
+            JOptionPane.showMessageDialog(this, "Falsche Portnummer");
         }
     }
 
